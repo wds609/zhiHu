@@ -8,6 +8,7 @@ import android.view.View;
 import com.bumptech.glide.Glide;
 import com.me.daily.core.api.ZhiHuApi;
 import com.me.daily.core.bean.News;
+import com.me.daily.ui.activity.DailyNewsActivity;
 import com.me.daily.ui.activity.DetailNewsActivity;
 import com.me.daily.ui.adapter.holder.DailyNewsItemViewHolder;
 import com.me.daily.utils.Constants;
@@ -29,15 +30,9 @@ public class DailyNewsItem extends MultipleTypesAdapterItem<News> {
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                goToDetail(context, ZhiHuApi.ZHIHU_DAILY_NEWS_CONTENT + data.id);
+                DailyNewsActivity.goToDetail(context, ZhiHuApi.ZHIHU_DAILY_NEWS_CONTENT + data.id);
             }
         });
     }
 
-    private void goToDetail(Context context, String url) {
-        Intent detail = new Intent();
-        detail.setClass(context, DetailNewsActivity.class);
-        detail.putExtra(Constants.EXTRA_URL, url);
-        context.startActivity(detail);
-    }
 }

@@ -2,17 +2,19 @@ package com.me.daily.ui.fragment;
 
 import android.os.Bundle;
 import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.me.daily.R;
+import com.me.daily.ui.activity.DetailNewsActivity;
 
 import butterknife.Bind;
 
 /**
  * Created by wds on 9/29/2015.
  */
-public class DetailNewsFragment extends BaseFragment {
+public class DetailNewsFragment extends BaseFragment implements DetailNewsActivity.OnBackKeyPressedListener {
     @Bind(R.id.webView)
     WebView webView;
     public String mUrl;
@@ -33,6 +35,7 @@ public class DetailNewsFragment extends BaseFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        ((DetailNewsActivity) getActivity()).setBackListener(this);
         setupWebView();
         webView.loadUrl(mUrl);
     }
@@ -44,6 +47,22 @@ public class DetailNewsFragment extends BaseFragment {
         webView.setWebViewClient(new ViewClient());
         webView.getSettings().setLoadWithOverviewMode(true);
         webView.getSettings().setAppCacheEnabled(true);
+        webView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+    }
+
+    private void removeTheHtmlHeader(WebView view) {
+        view.loadUrl("javascript:(function(){" +
+                "document.getElementsByClassName(\"header-for-mobile\")[0].style.display=\"none\";" +
+                "})()");
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (webView.canGoBack()) {
+            webView.goBack();
+        } else {
+            getActivity().finish();
+        }
     }
 
     private class ViewClient extends WebViewClient {
@@ -51,6 +70,13 @@ public class DetailNewsFragment extends BaseFragment {
             if (url != null) view.loadUrl(url);
             return true;
         }
+
+        @Override
+        public void onLoadResource(WebView view, String url) {
+            super.onLoadResource(view, url);
+            removeTheHtmlHeader(view);
+        }
+
     }
 
     private class ChromeClient extends WebChromeClient {
@@ -59,4 +85,5 @@ public class DetailNewsFragment extends BaseFragment {
             super.onProgressChanged(view, newProgress);
         }
     }
+
 }

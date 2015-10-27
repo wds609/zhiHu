@@ -3,6 +3,7 @@ package com.me.daily.ui.activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.os.PersistableBundle;
 import android.support.v7.graphics.Palette;
@@ -35,6 +36,16 @@ import de.greenrobot.event.ThreadMode;
 public class SplashActivity extends BaseActivity {
     @Bind(R.id.img_splash)
     ImageView imageSplash;
+    private Handler mHandler = new Handler();
+    private Runnable mStart = new Runnable() {
+        @Override
+        public void run() {
+            Intent intent = new Intent();
+            intent.setClass(SplashActivity.this, DailyNewsActivity.class);
+            startActivity(intent);
+            finish();
+        }
+    };
 
     @Override
     public int getLayoutId() {
@@ -45,15 +56,7 @@ public class SplashActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         new RefreshTask(DateUtil.getToday()).execute(RefreshArg.ALL);
-        new TimerUtil(new TimerUtil.CallBack() {
-            @Override
-            public void onTimerEnd() {
-                Intent intent = new Intent();
-                intent.setClass(SplashActivity.this, DailyNewsActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        }, 3000).start();
+        mHandler.postDelayed(mStart, 2000);
     }
 
     /**
@@ -68,7 +71,7 @@ public class SplashActivity extends BaseActivity {
             protected Bitmap transform(BitmapPool pool, Bitmap toTransform, int outWidth, int outHeight) {
                 Palette.from(toTransform).generate(new Palette.PaletteAsyncListener() {
                     public void onGenerated(Palette p) {
-                        int baseColor=p.getVibrantSwatch().getRgb();
+                        int baseColor = p.getVibrantSwatch().getRgb();
                         PrefUtil.saveBaseColor(getApplicationContext(), baseColor);
                         setStatusBarColor(baseColor);
                     }
@@ -78,4 +81,11 @@ public class SplashActivity extends BaseActivity {
         }).into(imageSplash);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mHandler.hasCallbacks(mStart)) {
+            mHandler.removeCallbacks(mStart);
+        }
+    }
 }

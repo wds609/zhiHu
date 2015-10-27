@@ -1,10 +1,13 @@
 package com.me.daily.ui.activity;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 
 import com.me.daily.R;
 import com.me.daily.utils.ColorUtil;
+import com.me.daily.utils.Constants;
 import com.me.daily.utils.PrefUtil;
 
 import butterknife.Bind;
@@ -35,5 +38,12 @@ public class DailyNewsActivity extends BaseActivity {
     @Override
     public boolean isUseEventBus() {
         return false;
+    }
+
+    public static void goToDetail(Context context, String url) {
+        Intent detail = new Intent();
+        detail.setClass(context, DetailNewsActivity.class);
+        detail.putExtra(Constants.EXTRA_URL, url);
+        context.startActivity(detail);
     }
 }
